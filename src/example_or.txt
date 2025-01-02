@@ -1,12 +1,8 @@
 # this is a comment$
 # all the required rules and symbols, along with the bonus ones, will be
 # shown here. spacing is not important
-A | B => D # A and B and C implies D
-A | C => E
-C | A => V
-D | F => Z
-V | N => W
-=AB # Initial facts : A, B and G are true. All others are false.
-# If no facts are initially true, then a simple "=" followed
-# by a newline is used
-?D # Queries : What is D
+A | B => !A | D # Since A is in the initial facts it should deduce than D is True since the other condition cant be true.
+D | E => F | G # Will need the next rule to verify which one is true.
+D | A => !F # By deduction then G is true because this rule implies than F is false.
+=AB
+?DFG

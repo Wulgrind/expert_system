@@ -16,7 +16,10 @@ class expert_system:
             if fact in i :
                 i.remove(fact)
                 if len(i) == 1:
-                    self.facts.append(i[0])
+                    if len(i[0] > 1):
+                        self.false_facts.append(i[0])
+                    else:
+                        self.facts.append(i[0])
                     delete_list.append(i)
         for i in delete_list:
             self.or_facts.remove(i)
@@ -39,13 +42,59 @@ class expert_system:
                                     print(f"Rule '{rule}' contradict another rule, saying that {solved_rule[index]} is false. This rule will be ignored")
                                 elif solved_rule[index] not in self.false_facts:
                                     self.false_facts.append(solved_rule[index])
-                                    self.check_or_facts(solved_rule[index])
+                                self.check_or_facts(solved_rule[index])
                             else :
                                 if solved_rule[index] in self.false_facts:
-                                    print(f"Rule '{rule}' contradict another rule, saying that {solved_rule[index]} is True. This rule will be ignored")
+                                    print(f"Rule '{rule}' contradict another rule, saying that {solved_rule[index]} is true. This rule will be ignored")
                                 elif solved_rule[index] not in self.facts:
                                     self.facts.append(solved_rule[index])
-
+                                self.check_or_facts('!' + solved_rule[index])
+            elif '|' in solved_rule:
+                tmp_list = []
+                while index < len(solved_rule) - 1:
+                    index += 1
+                    if solved_rule[index] != ' ' and solved_rule[index] != '|':
+                        if solved_rule[index] == '!':
+                            neg = 1
+                        else :
+                            res = ''
+                            if neg == 1 :
+                                neg = 0
+                                res += '!'
+                            res += str(solved_rule[index])
+                            if len(res) > 1 and res[1] not in self.facts:
+                                tmp_list.append(res)
+                            elif len(res) == 1 and res not in self.false_facts:
+                                tmp_list.append(res)
+                if len(tmp_list) >= 2:
+                    self.or_facts.append(tmp_list)
+                elif len(tmp_list) == 1:
+                    if len(tmp_list[0]) > 1:
+                        self.false_facts.append(tmp_list[0])
+                    else :
+                        self.facts.append(tmp_list[0])
+            elif '^' in solved_rule:
+            else:
+                while index < len(solved_rule) - 1:
+                    index += 1
+                    neg = 0
+                    if solved_rule[index] != ' ':
+                        if solved_rule[index] == '!':
+                            neg = 1
+                        else :
+                            if neg == 1:
+                                if solved_rule[index] in self.facts:
+                                    print(f"Rule '{rule}' contradict another rule, saying that {solved_rule[index]} is false. This rule will be ignored")
+                                else :
+                                    self.false_facts.append(solved_rule[index])
+                                    self.check_or_facts(solved_rule[index])
+                            elif neg == 0:
+                                if solved_rule[index] in self.false_facts:
+                                    print(f"Rule '{rule}' contradict another rule, saying that {solved_rule[index]} is true. This rule will be ignored")
+                                else:
+                                    self.facts.append(solved_rule[index])
+                                    self.check_or_facts('!' + solved_rule(index))
+                            
 
     def treate_or(self, rule):
         rule = list(rule) 
@@ -134,7 +183,8 @@ class expert_system:
             solved_rule = self.treate_and_xor(rule)
         if '|' in rule:
             solved_rule = self.treate_or(rule)
-        solved_rule = self.conclude(solved_rule , rule)
+        if not '2' in solved_rule :
+            solved_rule = self.conclude(solved_rule , rule)
         return solved_rule
         
 
