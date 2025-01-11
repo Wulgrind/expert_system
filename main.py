@@ -1,23 +1,49 @@
 from sys import argv
+import re
 
-### Must have queries and rules
-### Check if rule contradict a fact on any other rule.
 class expert_system:
     def __init__(self, file_path):
         self.file_path = file_path 
         self.parse_input_file(file_path)
-        for i in range(200):
-            print(f"\nLoop numnber : {i + 1}")
-            self.find_values()
-        print("\n\nResults for our queries :\n")
-        for i in self.queries:
-            if i in self.facts:
-                print(f"{i} is True.")
-            else:
-                print(f"{i} is False.")
+        self.initial_facts = self.facts.copy()
+        self.found_fact = 1
+        self.added_fact = 1
+        i = 0
+        while self.added_fact == 1:
+            self.added_fact = 0
+            while self.found_fact == 1:
+                i += 1
+                self.found_fact = 0
+                print(f"\nLoop numnber : {i}")
+                self.find_values()
+            print("\nResults for our queries :")
+            for i in self.queries:
+                if i in self.facts:
+                    print(f"{i} is True.")
+                else:
+                    print(f"{i} is False.")
+            self.get_new_facts()
+
+    def get_new_facts(self):
+        print(f"\nActual initial facts : {self.initial_facts}")
+        new_facts = input("Would you like to try with different facts ? Just type them, if they are already in they will be removed, if they arent we will add them.\n")
+        new_facts = new_facts.replace(" ", "")
+        for i in new_facts:
+            if i.isalpha():
+                if i in self.initial_facts:
+                    self.initial_facts.remove(i)
+                else :
+                    self.initial_facts.append(i)
+                self.facts = self.initial_facts.copy()
+                self.false_facts = []
+                self.or_facts = []
+                self.added_fact = 1
+
+
 
     def conclude(self, solved_rule):
         print("Which implies :")
+
         index = solved_rule.find(">")
         neg = 0
         true_values = []
@@ -137,9 +163,11 @@ class expert_system:
             for i in true_values:
                 if i not in self.facts:
                     self.facts.append(i)
+                    self.found_fact = 1
             for i in false_values:
                 if i not in self.false_facts:
                     self.false_facts.append(i)
+                    self.found_fact = 1
 
                             
 
@@ -209,12 +237,15 @@ class expert_system:
         rule = list(rule)
         indexes = [i for i, char in enumerate(rule) if char == "!"]
         for i in indexes:
-            if rule[i + 1] not in self.facts:
-                print(f"{rule[i + 1]} isnt in our facts so the condition {rule[i] + rule[i + 1]} is True.")
+            next_i = i + 1
+            while next_i == ' ':
+                next_i += 1
+            if rule[next_i] not in self.facts:
+                print(f"{rule[next_i]} isnt in our facts so the condition {rule[i] + rule[next_i]} is True.")
                 rule[i + 1] = '1'
             else:
-                print(f"{rule[i + 1]} is in our facts so the condition {rule[i] + rule[i + 1]} is False.")
-                rule[i + 1] = '2'
+                print(f"{rule[next_i]} is in our facts so the condition {rule[i] + rule[next_i]} is False.")
+                rule[next_i] = '2'
             rule[i] = " "
         rule = "".join(rule)
         return rule
@@ -251,17 +282,51 @@ class expert_system:
             solved_rule = self.treate_and_xor(solved_rule)
         if '|' in rule:
             solved_rule = self.treate_or(solved_rule)
+        for i, char in enumerate(solved_rule):
+            if char.isalpha():
+                if char in self.facts:
+                    solved_rule = solved_rule[:i] + '1' + solved_rule[i:]
+                    print(f"Since {char} is true, the condition is true.")
+                else :
+                    solved_rule = solved_rule[:i] + '2' + solved_rule[i:]
+                    print(f"Since {char} is false, the condtion is false.")
+                break
         if not '2' in solved_rule and conclude == 1:
             solved_rule = self.conclude(rule)
         return solved_rule
  
     def find_values(self):
         """Func to find the value of each parameter with the given rules."""
+        print(self.rules)
         for rule in self.rules:
             print(f"\nEvaluating rule : {rule}")
             self.solve_rule(rule)
 
-    def parse_input_file(self,nfile_path):
+    def check_args(self, line):
+        indexes = [i for i, char in enumerate(line) if char == "+" or char == '|' or char == '^']
+        for i in indexes:
+            next_i = i + 1
+            prev_i = i - 1
+            while next_i < len(line) and line[next_i] == ' ':
+                next_i += 1
+            while prev_i >= 0 and line[prev_i] == ' ':
+                prev_i -= 1
+            if not line[next_i].isalpha() and line[next_i] != '(' and line[next_i] != '!':
+                exit("Operator has to be folllowed by an alpha value or '( or !'")
+            if not line[prev_i].isalpha() and line[prev_i] != ')':
+                 exit("Operator has to be preceded by an alpha value or ')'")
+        indexes = [i for i, char in enumerate(line) if char == '!']
+        for i in indexes:
+            next_i = i + 1
+            while next_i < len(line) and line[next_i] == ' ':
+                next_i += 1
+            if not line[next_i].isalpha() and line[next_i] != '(':
+                 exit("'!' has to be folllowed by an alpha value or '('")
+        if line.count('(') != line.count(')'):
+            exit("Amount of opening and closing parenthesis signs has to be the same")
+
+
+    def parse_input_file(self, file_path):
         """Open and parse the input file, returning the rules, initial_facts and queries."""
         rules = []
         initial_facts = []
@@ -270,18 +335,45 @@ class expert_system:
         with open(file_path, "r") as file:
             for line in file:
                 line = line.split('#')[0].strip()
+                bi_rule = None
                 if not line:
                     continue
+                print(line)
+                if line.startswith("="):
+                    initial_facts = list(line[1:].strip())
 
-                if "=>" in line or "<=>" in line:
-                    rules.append(line)
+                elif "=" in line:
+                    if line.count('=') != 1 or line.count('<') > 1 or line.count('>') != 1 :
+                        exit("Rule can only contain one '< | = | >'")
+                    if '<' in line:
+                        first_i = line.find('<')
+                        next_i = first_i + 1
+                        while next_i < len(line) and line[next_i] == ' ':
+                            next_i += 1
+                        if line[next_i] != '=':
+                            exit(f"{line} badly formatted, < needs to be followed by a =")
+                        line = re.sub(r'<\s*=', '<=', line)
+                        left, right = line.split('<=>')
+                        bi_rule = f"{right.strip()} => {left.strip()}"
+                        line = line.replace('<', '', 1)
 
-                elif line.startswith("="):
-                    initial_facts = list(line[1:].strip()) 
+                    eq_i = line.find('=')
+                    next_i = eq_i + 1
+                    while next_i < len(line) and line[next_i] == ' ':
+                        next_i += 1
+                    if next_i < len(line) and line[next_i] == '>':
+                        line = re.sub(r'=\s*>', '=>', line)
+                        self.check_args(line)
+                        rules.append(line)
+                        if bi_rule:
+                            rules.append(bi_rule)
+                    else :
+                        exit(f"{line} badly formatted, = needs to be followed by a >")
 
                 elif line.startswith("?"):
                     queries = list(line[1:].strip())
-
+        if len(rules) == 0:
+            exit("You need to provide at least one rule.")
         self.rules = rules
         self.facts = initial_facts
         self.queries = queries
@@ -295,7 +387,3 @@ if __name__ == '__main__':
     except Exception :
         exit("Please provide the filepath as your first arg.")
     expert = expert_system(file_path)
-
-    print("Rules:", expert.rules)
-    print("Initial Facts:", expert.facts)
-    print("Queries:", expert.queries)

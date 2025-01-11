@@ -1,5 +1,6 @@
 A + B | (!C ^ !D) => E + F # A and B  implies E and F
+Z <=> J | E # This one is biconditionnal so J | E is true since E is true, which make Z true.
 
 =ABC
 
-?EF # Queries : What is E
+?DEFJZ
