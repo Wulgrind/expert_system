@@ -39,9 +39,22 @@ class expert_system:
                 self.or_facts = []
                 self.added_fact = 1
 
-
+    def check_conclusion_operators(self, solved_rule):
+        solved_rule = solved_rule.split(">")[1]
+        tmp = None
+        for i in solved_rule:
+            if i == '+' or i == '|' or i == '^':
+                if tmp == None:
+                    tmp = i
+                elif tmp != i :
+                    return False
+        return True
 
     def conclude(self, solved_rule):
+        if not self.check_conclusion_operators(solved_rule):
+            print(f"Different operators in conclusion, ignore rule {solved_rule}.")
+            self.rules.remove(solved_rule)
+            return
         print("Which implies :")
 
         index = solved_rule.find(">")
