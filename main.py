@@ -8,13 +8,13 @@ class expert_system:
         self.initial_facts = self.facts.copy()
         self.found_fact = 1
         self.added_fact = 1
-        i = 0
+        index = 0
         while self.added_fact == 1:
             self.added_fact = 0
             while self.found_fact == 1:
-                i += 1
+                index += 1
                 self.found_fact = 0
-                print(f"\nLoop numnber : {i}")
+                print(f"\nLoop numnber : {index}")
                 self.find_values()
             print("\nResults for our queries :")
             for i in self.queries:
@@ -23,6 +23,7 @@ class expert_system:
                 else:
                     print(f"{i} is False.")
             self.get_new_facts()
+            index = 0
 
     def get_new_facts(self):
         print(f"\nActual initial facts : {self.initial_facts}")
@@ -38,6 +39,7 @@ class expert_system:
                 self.false_facts = []
                 self.or_facts = []
                 self.added_fact = 1
+                self.found_fact = 1
 
     def check_conclusion_operators(self, solved_rule):
         solved_rule = solved_rule.split(">")[1]
@@ -101,6 +103,9 @@ class expert_system:
                     else :
                         print(f"{tmp_list[0]} is the only assumption which isnt false so we can confirm it's value is true.")
                         true_values.append(tmp_list[0])
+                elif len(tmp_list) > 1:
+                    print(f"The conclusion is ambiguous and cant be concluded.")
+                    
 
             elif '^' in solved_rule:
                 true = None
@@ -144,10 +149,10 @@ class expert_system:
                         if i not in false:
                             if len(i) > 1: 
                                 false_values.append(i[1])
-                                print(f"{i} is automatically confirmed false because all other statements were wrong so this statement is true.")
+                                print(f"{i} is automatically confirmed false because there is no other verified statement so this statement is true.")
                             else :
                                 true_values.append(i)
-                                print(f"{i} is automatically confirmed true because all other statements were wrong so this statement is true.")
+                                print(f"{i} is automatically confirmed true because there is no other verified statement so this statement is true.")
                                                 
             else:
                 while index < len(solved_rule) - 1:
