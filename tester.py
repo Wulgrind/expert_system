@@ -8,10 +8,9 @@ if __name__ == '__main__':
         3 : 'example_or.txt',
         4 : 'example_xor.txt',
         5 : 'example_parenthesis.txt',
-        6 : 'example_input.txt',
-        7 : 'example_all.txt',
+        6 : 'example_all.txt',
     }
-    choice = input("What tests do you want to perform ?\n1 : '+'\n2 : '!'\n3 : '|'\n4 : '^'\n5 : '()'\n6 : Base input\n7 : All\n")
+    choice = input("What tests do you want to perform ?\n1 : '+'\n2 : '!'\n3 : '|'\n4 : '^'\n5 : '()'\n6 : All\n")
     for i in range(7):
         if str(i) in choice:
             choice_list.append(i)

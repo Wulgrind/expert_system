@@ -1,8 +1,7 @@
-A ^ B => D # A xor B implies D , false in this case
-A ^ C => E # A xor C implies E, which is true right now.
-D ^ E => E ^ F  ^ G # Since E is true, F and G are automatically false and non longer ambiguous.
-E ^ C => F ^ H ^ G # Since F and G have been verified as False above, H is true.
+A ^ B => E
+A ^ F => D
+
 
 =AB
 
-?DEH
+?DE

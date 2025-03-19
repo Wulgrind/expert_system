@@ -6,16 +6,10 @@ class expert_system:
         self.file_path = file_path 
         self.parse_input_file(file_path)
         self.initial_facts = self.facts.copy()
-        self.found_fact = 1
-        self.added_fact = 1
-        index = 0
-        while self.added_fact == 1:
-            self.added_fact = 0
-            while self.found_fact == 1:
-                index += 1
-                self.found_fact = 0
-                print(f"\nLoop numnber : {index}")
-                self.find_values()
+        self.retry = 1
+        while self.retry == 1:
+            self.find_values()
+            self.retry = 0
             print("\nResults for our queries :")
             for i in self.queries:
                 if i in self.facts:
@@ -23,7 +17,6 @@ class expert_system:
                 else:
                     print(f"{i} is False.")
             self.get_new_facts()
-            index = 0
 
     def get_new_facts(self):
         print(f"\nActual initial facts : {self.initial_facts}")
@@ -33,13 +26,12 @@ class expert_system:
             if i.isalpha():
                 if i in self.initial_facts:
                     self.initial_facts.remove(i)
-                else :
+                else:
                     self.initial_facts.append(i)
                 self.facts = self.initial_facts.copy()
                 self.false_facts = []
                 self.or_facts = []
-                self.added_fact = 1
-                self.found_fact = 1
+                self.retry = 1
 
     def check_conclusion_operators(self, solved_rule):
         solved_rule = solved_rule.split(">")[1]
@@ -127,7 +119,7 @@ class expert_system:
                                 if res[1] in self.false_facts:
                                     if true == None:
                                         true = res
-                                elif res[1] in self.facts :
+                                elif res[1] in self.facts:
                                     false.append(res)
                             else:
                                 if res in self.facts:
@@ -171,7 +163,6 @@ class expert_system:
             for i in true_values:
                 if i in self.false_facts:
                     print(f"Rule '{solved_rule}' contradict another rule, saying that {i} is true. This rule will be ignored")
-                    self.rules.remove(solved_rule)
                     return
             for i in false_values:
                 if i in self.facts:
@@ -315,10 +306,12 @@ class expert_system:
  
     def find_values(self):
         """Func to find the value of each parameter with the given rules."""
-        print(self.rules)
-        for rule in self.rules:
-            print(f"\nEvaluating rule : {rule}")
-            self.solve_rule(rule)
+        for q in self.queries:
+            rules = self.graph[q]
+            print(f"Trying to determinate {q}")
+            for rule in rules:
+                print(f"\nEvaluating rule : {rule}")
+                self.solve_rule(rule)
 
     def check_args(self, line):
         indexes = [i for i, char in enumerate(line) if char == "+" or char == '|' or char == '^']
@@ -356,7 +349,6 @@ class expert_system:
                 bi_rule = None
                 if not line:
                     continue
-                print(line)
                 if line.startswith("="):
                     initial_facts = list(line[1:].strip())
 
@@ -392,9 +384,17 @@ class expert_system:
                     queries = list(line[1:].strip())
         if len(rules) == 0:
             exit("You need to provide at least one rule.")
-        self.rules = rules
-        self.facts = initial_facts
+
+        self.graph = dict()
+        for q in queries:
+            value = []
+            for rule in rules:
+                endrule = rule.split("=>")
+                if q in endrule[1]:
+                    value.append(rule)
+            self.graph[q] = value
         self.queries = queries
+        self.facts = initial_facts
         self.false_facts = []
         self.or_facts = []
 

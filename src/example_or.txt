@@ -1,8 +1,6 @@
-# this is a comment$
-# all the required rules and symbols, along with the bonus ones, will be
-# shown here. spacing is not important
-A | B => !A | D # Since A is in the initial facts it should deduce than D is True since the other condition cant be true.
-D | E => F | G # Will need the next rule to verify which one is true.
-D | A => !F # By deduction then G is true because this rule implies that F is false.
-=AB
-?DFG
+A | D => C
+!C | !F => A
+
+=DE
+
+?A
