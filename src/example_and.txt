@@ -3,7 +3,7 @@
 # shown here. spacing is not important
 A + B => D + E # A and B  implies D and E
 D + E => !F + G # D and E implies that F is false and D is True
-D + A => F + G # D and A inplies that F and G are true , contradicting above rule.
+D + A => F + G # D and A implies that F and G are true , contradicting above rule.
 
 =AB
 

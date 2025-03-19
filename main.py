@@ -298,7 +298,7 @@ class expert_system:
                     print(f"Since {char} is true, the condition is true.")
                 else :
                     solved_rule = solved_rule[:i] + '2' + solved_rule[i:]
-                    print(f"Since {char} is false, the condtion is false.")
+                    print(f"Since {char} is false, the condition is false.")
                 break
         if not '2' in solved_rule and conclude == 1:
             solved_rule = self.conclude(rule)
@@ -306,12 +306,18 @@ class expert_system:
  
     def find_values(self):
         """Func to find the value of each parameter with the given rules."""
+        for key, value in self.graph.items():
+            for r in value:
+                print(f"\nEvaluating rule : {r}")
+                self.solve_rule(r)
+
         for q in self.queries:
-            rules = self.graph[q]
-            print(f"Trying to determinate {q}")
-            for rule in rules:
-                print(f"\nEvaluating rule : {rule}")
-                self.solve_rule(rule)
+            if q in self.graph:
+                rules = self.graph[q]
+                print(f"Trying to determinate {q}")
+                for rule in rules:
+                    print(f"\nEvaluating rule : {rule}")
+                    self.solve_rule(rule)
 
     def check_args(self, line):
         indexes = [i for i, char in enumerate(line) if char == "+" or char == '|' or char == '^']
@@ -386,13 +392,14 @@ class expert_system:
             exit("You need to provide at least one rule.")
 
         self.graph = dict()
-        for q in queries:
-            value = []
-            for rule in rules:
-                endrule = rule.split("=>")
-                if q in endrule[1]:
-                    value.append(rule)
-            self.graph[q] = value
+        for rule in rules:
+            endrule = rule.split("=>")
+            for i in endrule[1]:
+                if i.isalpha():
+                    if i in self.graph:
+                        self.graph[i] += [rule]
+                    else:
+                        self.graph[i] = [rule]
         self.queries = queries
         self.facts = initial_facts
         self.false_facts = []
