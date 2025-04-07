@@ -333,8 +333,12 @@ class expert_system:
         for i in indexes:
             next_i = i + 1
             prev_i = i - 1
-            while next_i < len(line) and line[next_i] == ' ':
+            if next_i >= len(line):
+                exit("Operator has to be folllowed by an alpha value or '( or !'") 
+            while next_i < len(line) - 1 and line[next_i] == ' ':
                 next_i += 1
+            if prev_i < 0:
+                exit("Operator has to be preceded by an alpha value or ')'")
             while prev_i >= 0 and line[prev_i] == ' ':
                 prev_i -= 1
             if not line[next_i].isalpha() and line[next_i] != '(' and line[next_i] != '!':
