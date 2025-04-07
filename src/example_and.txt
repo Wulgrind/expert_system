@@ -4,4 +4,4 @@ D + A => F + G
 
 =AB
 
-?DEFG # Queries : What are DEFG
+?DEFG
