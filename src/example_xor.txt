@@ -1,7 +1,6 @@
 A ^ B => E
 A ^ F => D
 
-
 =AB
 
 ?DE

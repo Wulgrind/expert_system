@@ -1,5 +1,5 @@
-A + B | (!C ^ !D) => E + F # A and B  implies E and F
-Z <=> J | E # This one is biconditionnal so J | E is true since E then Z is true.
+A + B | (!C ^ !D) => E + F
+Z <=> J | E
 
 =ABC
 

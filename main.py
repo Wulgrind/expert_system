@@ -7,8 +7,17 @@ class expert_system:
         self.parse_input_file(file_path)
         self.initial_facts = self.facts.copy()
         self.retry = 1
+        self.found_fact = 1
         while self.retry == 1:
-            self.find_values()
+            self.explored_rules = []
+            old_facts = self.facts.copy()
+            if self.found_fact == 1:
+                for q in self.queries:
+                    self.find_values(q)
+            if len(old_facts) >= len(self.facts):
+                self.found_fact = 0
+            else:
+                self.found_fact = 1
             self.retry = 0
             print("\nResults for our queries :")
             for i in self.queries:
@@ -32,6 +41,7 @@ class expert_system:
                 self.false_facts = []
                 self.or_facts = []
                 self.retry = 1
+                self.found_fact = 1
 
     def check_conclusion_operators(self, solved_rule):
         solved_rule = solved_rule.split(">")[1]
@@ -304,18 +314,17 @@ class expert_system:
             solved_rule = self.conclude(rule)
         return solved_rule
  
-    def find_values(self):
-        """Func to find the value of each parameter with the given rules."""
-        for key, value in self.graph.items():
-            for r in value:
-                print(f"\nEvaluating rule : {r}")
-                self.solve_rule(r)
-
-        for q in self.queries:
-            if q in self.graph:
-                rules = self.graph[q]
-                print(f"Trying to determinate {q}")
-                for rule in rules:
+    def find_values(self, query):
+        if query in self.graph:
+            rules = self.graph[query]
+            print(f"Trying to determinate {query}")
+            for rule in rules:
+                if rule not in self.explored_rules:
+                    self.explored_rules.append(rule)
+                    condition = rule.split("=>")[0]
+                    for i in condition :
+                        if i.isalpha():
+                            self.find_values(i)
                     print(f"\nEvaluating rule : {rule}")
                     self.solve_rule(rule)
 

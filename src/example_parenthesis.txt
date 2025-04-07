@@ -1,4 +1,4 @@
-A + (B | (C | A)) => D # In this combination of multiple 'or' A in the only true, the condition is true because of the parenthis priority order.
-A + (B | (C | E) ) => F # Same combination as before but replace A with E , the condition is false.
+A + (B | (C | A)) => D
+A + (B | (C | E) ) => F
 =A
 ?DF
